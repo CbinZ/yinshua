@@ -1,0 +1,485 @@
+
+<style type="text/css">
+	.search
+	{
+		padding: 30px 0;
+		margin-bottom: 10px;
+		position: relative;
+		width:100%;
+		background-color: #F7DAA5;
+
+	}
+
+  .input-div 
+  {
+    padding: 0 5px;
+  }
+</style>
+
+<div class="layui-row search ">
+ <form class="layui-form" action="">
+  <div class="layui-col-md10  layui-col-md-offset1 ">
+   <div class="layui-col-md2 input-div">
+     <input type="text" name="cpbh"  placeholder="请输入产品编号" autocomplete="off" class="layui-input">
+   </div>
+   <div class="layui-col-md2 input-div">
+     <input type="text" name="cpmc"  placeholder="请输入生产名称" autocomplete="off" class="layui-input">
+   </div>
+   <div class="layui-col-md2 input-div">
+     <input type="text" name="khmc"  placeholder="请输入客户名称" autocomplete="off" class="layui-input">
+   </div>
+   <div class="layui-col-md2 input-div">
+    <select name="ly">
+      <option value="1">已领用</option>
+      <option value="2" selected >未领用</option>
+    </select>
+  </div>
+  <div class="layui-col-md1">
+   <button class="layui-btn layui-btn-warm layui-btn-fluid" lay-submit lay-filter="formDemo">
+     <i class="layui-icon layui-icon-search"></i> 
+   </button>
+ </div>
+</div>
+</form>
+</div>
+
+<div class="layui-row">
+  <div class="layui-col-md10 layui-col-md-offset1" style="height:400;">
+
+   <table id="demo" lay-filter="test"></table>
+ </div>
+</div>
+
+<script type="text/html" id="toolbarDemo">
+  <div class="layui-btn-container">
+    <button class="layui-btn layui-btn-sm" lay-event="plly">批量领用</button>
+    <button class="layui-btn layui-btn-sm" lay-event="plbf">批量报废</button>
+    <button class="layui-btn layui-btn-sm" lay-event="pldy">批量打印</button>
+  </div>
+</script>
+
+<script type="text/html" id="barDemo">
+  {{#  if(d.ly < 1) { }}
+  <a class="layui-btn layui-btn-xs" lay-event="ly">领用</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="bf">报废</a>
+  {{# } else { }}
+  <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event='yly'>已领用</a>
+  {{# } }}
+</script>
+
+
+
+<script>
+//Demo
+layui.use(['form', 'table', 'layer'], function(){
+  var form = layui.form;
+  var table = layui.table;
+  var layer = layui.layer;
+  var $ = layui.$;
+  form.render(); 
+  //监听提交
+  form.on('submit(formDemo)', function(data){
+    //layer.msg(data.field.scdh);
+    //
+    table.reload('idTest', {
+     url: '/index.php/ruku/chaxun/data'
+     ,where: {
+      data:data.field
+	  } //设定异步数据接口的额外参数
+	  //,height: 300
+	});
+    return false;
+  });
+
+  table.render({
+    elem: '#demo'
+    ,height: 'full-200'
+    ,url: '/index.php/ruku/chaxun/data' //数据接口
+    ,toolbar: '#toolbarDemo'
+    ,defaultToolbar: []
+    ,cellMinWidth: 80 
+    ,page: {layout:['count','prev', 'page', 'next']} //开启分页
+    ,totalRow: true
+    ,cols: [[ //表头
+    {type: 'checkbox', fixed: 'left'}
+    ,{field: 'xh', title: '序号', width:80, fixed: 'left', totalRowText: '合计'}
+    ,{field: 'khmc', title: '客户名称', width:90}
+    ,{field: 'cpbh', title: '产品编号'}
+    ,{field: 'cpmc', title: '产品名称'}
+    ,{field: 'cpgg', title: '产品规格'} 
+    ,{field: 'ystb', title: '印刷跳步', width: 90}
+    ,{field: 'ylms', title: '余料米数', width: 90}
+    ,{field: 'pbsl', title: '拼板模数', width: 90}
+    ,{field: 'ylsl', title: '余料数量', width: 90, totalRow: true}
+    ,{field: 'dw', title: '单位', width: 90}
+    ,{field: 'cw', title: '仓位', width: 90}
+    ,{field: 'kl', title:'库龄', sort:true}
+    ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:150}
+    ]]
+    ,id: "idTest"
+
+  });
+
+  //监听行单击事件（双击事件为：rowDouble）
+  /*table.on('row(test)', function(obj){
+    var data = obj.data;
+    
+    layer.alert(JSON.stringify(data), {
+      title: '当前行数据：'
+    });
+    
+    //标注选中样式
+    obj.tr.addClass('layui-table-click').siblings().removeClass('layui-table-click');
+  });*/
+
+  //监听行工具事件
+  table.on('tool(test)', function(obj){
+    var data = obj.data;
+    //console.log(obj)
+    if(obj.event === 'ruku-btn'){
+
+      if (data.ylms == "" || data.cw == "" ) {
+        layer.msg("余料米数和仓位不能为空");
+        return false;
+      }
+
+      $.post("/index.php/ruku/add",{
+        data:data
+      },function(str){
+        str = eval('('+str+')');
+
+        if (str.errcode == '0') {
+         obj.del();
+
+       }else{
+        layer.msg("操作失败，请联系管理员");
+      }
+    })
+    } 
+  });
+
+  table.on('checkbox(test)', function(obj){
+    //console.log(obj.checked); //当前是否选中状态
+    //console.log(obj.data); //选中行的相关数据
+    //console.log(obj.type); //如果触发的是全选，则为：all，如果触发的是单选，则为：one
+
+
+  });
+
+    //工具栏事件
+    table.on('toolbar(test)', function(obj){
+      var checkStatus = table.checkStatus(obj.config.id);
+      switch(obj.event){
+        case 'plly':
+        var data = checkStatus.data;
+
+        for(var key in data){
+          if (data[key].ly == 1) {
+            layer.alert("产品编号："+data[key].cpbh+",已经领用");
+            return false;
+          }
+        };
+        // layer.alert(JSON.stringify(data));
+        
+        var html = "";
+
+        for(var key2 in data){
+
+          html += "产品名称："+data[key2].cpmc+",产品编号："+data[key2].cpbh+"<br>";
+        }
+        layer.open({
+          type: 1,
+          area: ['500px', '300px'],
+          content: html, //这里content是一个普通的String
+          btn: ['确认'],
+          yes: function(index, layero){
+            layer.close(index);
+
+            layer.prompt({
+              formType: 0,
+              value: '',
+              title: '领用单号'
+
+            }, function(value, index, elem){
+          //alert(value); //得到value
+          
+              $.post('/index.php/ruku/chaxun/plly',{
+                lybz:value,
+                data:data
+              },function(str){
+                str = eval("("+str+")");
+
+                if (str.errcode == '0') {
+
+                  layer.msg('领用成功');
+
+                  table.reload('idTest', {
+                    url: '/index.php/ruku/chaxun/data'
+                    ,where: {
+                    } //设定异步数据接口的额外参数
+                    //,height: 300
+                  });
+                }else{
+                  layer.msg(str.errmsg);
+                }
+              })
+              layer.close(index);
+            });
+          }
+        });
+        
+        
+        break;
+        case 'plbf':
+        var data = checkStatus.data;
+        //layer.msg('选中了：'+ data.length + ' 个');
+        for(var key in data){
+          if (data[key].ly == 1) {
+            layer.alert("产品编号："+data[key].cpbh+",已经领用");
+            return false;
+          }
+        };
+
+        var html = "";
+
+        for(var key2 in data){
+
+          html += "产品名称："+data[key2].cpmc+",产品编号："+data[key2].cpbh+"<br>";
+        }
+        layer.open({
+          type: 1,
+          area: ['500px', '300px'],
+          content: html, //这里content是一个普通的String
+          btn: ['确认'],
+          yes: function(index, layero){
+            layer.close(index);
+
+            layer.confirm('确认报废?', function(index){
+              //do something
+              $.post('/index.php/ruku/chaxun/plbf',{
+                data:data
+              },function(str){
+                str = eval("("+str+")");
+
+                if (str.errcode == '0') {
+
+                  layer.msg('报废成功');
+
+                  table.reload('idTest', {
+                    url: '/index.php/ruku/chaxun/data'
+                    ,where: {
+                            } //设定异步数据接口的额外参数
+                            //,height: 300
+                          });
+                }else{
+                  layer.msg(str.errmsg);
+                }
+              });
+              layer.close(index);
+            });
+          }
+        });
+        break;
+
+        case 'pldy':
+
+        var data = checkStatus.data;
+        //layer.msg('选中了：'+ data.length + ' 个');
+        var scdh = "";
+
+        var cpbh = "";
+        for(var key in data){
+
+         /* if (data[key].ly != 1) {
+            layer.alert("产品名称："+data[key].cpmc+"，产品编号："+data[key].cpbh+",未领用");
+            return false;
+          }*/
+
+          if (scdh == "") {
+            scdh = data[key].lydh;
+          }else{
+            if (scdh != data[key].lydh ) {
+               layer.alert("产品名称："+data[key].cpmc+"，产品编号："+data[key].cpbh+",与上一个打印产品领用单号不同");
+                return false;
+            }
+          }
+
+          if (cpbh == "") {
+            cpbh += data[key].cpbh;
+          }else{
+            cpbh += "','"+data[key].cpbh;
+          }
+        };
+
+
+        layer.open({
+          type: 2, 
+          content: '/index.php/ruku/chaxun/dayin?cpbh='+cpbh //这里content是一个URL，如果你不想让iframe出现滚动条，你还可以content: ['http://sentsin.com', 'no']
+        });
+
+
+
+
+        break;
+      };
+    });
+
+    //监听行工具事件
+    table.on('tool(test)', function(obj){
+      var data = obj.data;
+    //console.log(obj)
+    if(obj.event === 'ly'){
+      //例子2
+      layer.prompt({
+        formType: 0,
+        value: '',
+        title: data.cpmc+'|'+data.cpbh
+
+      }, function(value, index, elem){
+          //alert(value); //得到value
+          $.post("/index.php/ruku/chaxun/ly",{
+            lybz:value,
+            cpbh:data.cpbh
+          },function(str){
+            str = eval("("+str+")");
+
+            if (str.errcode == '0') {
+              table.reload('idTest', {
+                url: '/index.php/ruku/chaxun/data'
+                ,where: {
+            } //设定异步数据接口的额外参数
+            //,height: 300
+          });
+
+            }else{
+              layer.msg(str.errmsg);
+            }
+          });
+
+          layer.close(index);
+        });
+
+    } else if(obj.event === 'bf'){
+
+
+      layer.confirm('是否报废"产品编号：'+data.cpbh+'"，产品名称："'+data.cpmc+'"?',{icon: 3, title:'提示'}, function(index){
+  //do something
+        $.post("/index.php/ruku/cxrk",{
+          cpbh:data.cpbh
+        },function(str){
+          str = eval("("+str+")");
+
+          if (str.errcode == '0') {
+
+            layer.msg('报废成功');
+
+            table.reload('idTest', {
+              url: '/index.php/ruku/chaxun/data'
+              ,where: {
+                    } //设定异步数据接口的额外参数
+                    //,height: 300
+                  });
+          }else{
+            layer.msg(str.errmsg);
+          }
+        })
+        layer.close(index);
+      });   
+      
+    } else if (obj.event === 'yly') {
+      var html = "<div style='padding:10px;'><p>客户名称："+data.khmc+"</p>"+
+                  "<p>产品编号："+data.cpbh+"</p>" +
+                  "<p>产品名称："+data.cpmc+"</p>" +
+                  "<p>余料米数："+data.ylms+"</p>" +
+                  "<p>余料数量："+data.ylsl+"</p>" +
+                  "<p>单位："+data.dw+"</p>" +
+                  "<p>仓位："+data.cw+"</p>" +
+                  "<p>单号："+data.lydh+"</p>" +
+                  "<p><button class='layui-btn' id='dy'>打印</button><button class='layui-btn layui-btn-danger' id='cxly'>撤销领用</button></p></div>" 
+
+
+      var index2 = layer.open({
+        type: 1, 
+        content: html //这里content是一个普通的String
+      });
+
+
+      $("#dy").click(function(){
+       layer.open({
+          type: 2, 
+          content: '/index.php/ruku/chaxun/dayin?cpbh='+data.cpbh //这里content是一个URL，如果你不想让iframe出现滚动条，你还可以content: ['http://sentsin.com', 'no']
+        });
+      });
+
+      $("#cxly").click(function(){
+
+             layer.confirm('是否撤销领用"产品编号：'+data.cpbh+'"，产品名称："'+data.cpmc+'"?',{icon: 3, title:'提示'}, function(index){
+              //do something
+                    $.post("/index.php/ruku/cxly",{
+                      cpbh:data.cpbh
+                    },function(str){
+                      str = eval("("+str+")");
+
+                      if (str.errcode == '0') {
+
+                        layer.msg('撤销成功');
+
+                        table.reload('idTest', {
+                          url: '/index.php/ruku/chaxun/data'
+                          ,where: {
+                                } //设定异步数据接口的额外参数
+                                //,height: 300
+                              });
+                      }else{
+                        layer.msg(str.errmsg);
+                      }
+                    })
+                    layer.close(index);
+                    layer.close(index2);
+                  });  
+      })
+    }
+  });
+
+  table.on('edit(test)', function(obj){ //注：edit是固定事件名，test是table原始容器的属性 lay-filter="对应的值"
+    //console.log(obj.value); //得到修改后的值
+    //console.log(obj.field); //当前编辑的字段名
+    //console.log(obj.data); //所在行的所有相关数据  
+    var field = obj.field;
+    var value = obj.value;
+    var regPos = /^\d+(\.\d+)?$/; //非负浮点数
+    var regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数
+    if(regPos.test(value) || regNeg.test(value)){
+
+    }else{
+     layer.msg('请输入数字');
+       var oldValue = $(this).prev().text(); // 修改前的值
+       $(this).val(oldValue); // 重置为修改前的值
+     }
+   });
+
+  //监听排序事件 
+table.on('sort(test)', function(obj){ //注：sort 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
+  console.log(obj.field); //当前排序的字段名
+  console.log(obj.type); //当前排序类型：desc（降序）、asc（升序）、null（空对象，默认排序）
+  console.log(this); //当前排序的 th 对象
+  
+  //尽管我们的 table 自带排序功能，但并没有请求服务端。
+  //有些时候，你可能需要根据当前排序的字段，重新向服务端发送请求，从而实现服务端排序，如：
+  table.reload('idTest', {
+    initSort: obj //记录初始排序，如果不设的话，将无法标记表头的排序状态。
+    ,where: { //请求参数（注意：这里面的参数可任意定义，并非下面固定的格式）
+      field: obj.field //排序字段
+      ,order: obj.type //排序方式
+    } 
+    ,page: {
+    curr: 1 //重新从第 1 页开始
+  }
+
+});
+  
+ // layer.msg('服务端排序。order by '+ obj.field + ' ' + obj.type);
+});
+
+});
+</script>

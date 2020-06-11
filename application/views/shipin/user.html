@@ -1,0 +1,125 @@
+<div class="layui-col-md6" style="padding:10px;">
+  <div style="padding:10px;border:1px solid  #eeeeee;">
+    <form class="layui-form" action="">
+      <div class="layui-form-item">
+        <label class="layui-form-label">视频名称</label>
+        <div class="layui-input-block">
+          <input type="text" name="v_name" required  lay-verify="required" placeholder="请输入用户姓名" autocomplete="off" class="layui-input">
+        </div>
+      </div><div class="layui-form-item">
+        <label class="layui-form-label"></label>
+        <div class="layui-input-block">
+          <input type="text" name="img_url" id="img_url" value="">
+          <button type="button" class="layui-btn" id="test1">
+            <i class="layui-icon">&#xe67c;</i>上传封面图片
+          </button>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label"></label>
+        <div class="layui-input-block">
+          <input type="text" name="video_url" id="video_url" value="">
+          <button type="button" class="layui-btn" id="test2">
+            <i class="layui-icon">&#xe67c;</i>上传视频
+          </button>
+        </div>
+        
+      </div>
+      
+     
+      <div class="layui-form-item">
+        <div class="layui-input-block">
+          <button class="layui-btn" type="button" lay-submit lay-filter="formDemo">立即提交</button>
+          <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+ 
+<div class="layui-col-md6" style="padding:10px;">
+  <div style="padding:10px;border:1px solid  #eeeeee;">
+    <table id="demo" lay-filter="test"></table>
+  </div>
+</div>
+
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+ 
+</script>
+
+<script>
+//Demo
+layui.use(['form', 'table',  'upload'], function(){
+  var $ = layui.$;
+  var form = layui.form;
+  var table = layui.table;
+  var upload = layui.upload;
+  form.render(); //更新全部
+  //监听提交
+  form.on('submit(formDemo)', function(data){
+    // layer.msg(JSON.stringify(data.field));
+     $.post("/index.php/shipin/user/add_a",{
+      data:JSON.stringify(data.field)
+    },function(str){
+      
+      str = eval('('+str+')');
+
+      if (str.errcode == '0') {
+        history.go(0)   
+      }else{
+        layer.msg(str.errmsg);
+      }
+    });
+
+    return false;
+   
+  });
+
+  //第一个实例
+  table.render({
+    elem: '#demo'
+    ,height: 724
+    ,url: '/index.php/shipin/user/data' //数据接口
+  
+    ,cols: [[ //表头
+      {field: 'id', title: 'ID', width:80, fixed: 'left'}
+      ,{field: 'user_name', title: '用户名', width:80}
+      ,{field: 'zhanhao', title: '账号', width:177,}
+      ,{field: 'password', title: '密码', width:177} 
+      ,{field: 'user_ytpe', title: '视频类型'}
+    ]]
+  });
+
+
+  //执行实例
+  var uploadInst = upload.render({
+    elem: '#test1' //绑定元素
+    ,url: '/index.php/shipin/upload/img' //上传接口
+    ,done: function(res){
+      //上传完毕回调
+      // res =("("+res+")");
+      $("#img_url").val("/"+res.file_path);
+    }
+    ,error: function(){
+      //请求异常回调
+    }
+  });
+ 
+   //执行实例2
+  var uploadInst = upload.render({
+    elem: '#test2' //绑定元素
+    ,url: '/index.php/shipin/upload/video' //上传接口
+    ,accept:'video'
+    ,done: function(res){
+      //上传完毕回调
+      // res =eval("("+res+")");
+      $("#video_url").val(res.file_path);
+    }
+    ,error: function(){
+      //请求异常回调
+    }
+  });
+
+});
+</script>

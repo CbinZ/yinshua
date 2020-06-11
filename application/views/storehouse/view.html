@@ -1,0 +1,304 @@
+<link rel="stylesheet" href="/yinshua/resource/layui/css/layui.css">
+<script src="/yinshua/resource/layui/layui.all.js"></script>
+
+
+<blockquote class="layui-elem-quote">增删改查</blockquote>
+
+<fieldset class="layui-elem-field">
+  <legend>添加</legend>
+  <div class="layui-field-box">
+    <form class="layui-form" action="">
+		<div class="layui-col-md4">
+			<div class="layui-form-item">
+			    <label class="layui-form-label">仓库名称</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="name" required  lay-verify="required" placeholder="请输入仓库名称" autocomplete="off" class="layui-input">
+			    </div>
+			</div>
+		</div>
+
+		<div class="layui-col-md4">
+			<div class="layui-form-item">
+			    <label class="layui-form-label">仓库别名</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="name_sc" required  lay-verify="required" placeholder="请输入仓库名称" autocomplete="off" class="layui-input">
+			    </div>
+			</div>
+		</div>
+
+		<div class="layui-col-md4">
+			<div class="layui-form-item">
+			    <label class="layui-form-label">所在楼</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="building" required  lay-verify="required" placeholder="请输入所在楼" autocomplete="off" class="layui-input">
+			    </div>
+			</div>
+		</div>
+		
+		<div class="layui-col-md4">
+			<div class="layui-form-item">
+			    <label class="layui-form-label">仓库房间号</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="room" required  lay-verify="required" placeholder="请输入仓库房间号" autocomplete="off" class="layui-input">
+			    </div>
+			</div>
+		</div>
+
+		<div class="layui-col-md4">
+			<div class="layui-form-item">
+			    <label class="layui-form-label">功能描述</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="desc" required  lay-verify="required" placeholder="请输入仓库功能描述" autocomplete="off" class="layui-input">
+			    </div>
+			</div>
+		</div>
+
+		<div class="layui-col-md4">
+			<div class="layui-form-item">
+			    <div class="layui-input-block">
+			      <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+			    </div>
+			</div>
+		</div>
+
+    </form>
+  </div>
+</fieldset>
+	
+
+<fieldset class="layui-elem-field">
+  <legend>查询</legend>
+  <div class="layui-field-box">
+    <form class="layui-form" action="">
+		<div class="layui-col-md4">
+			<div class="layui-form-item">
+			    <label class="layui-form-label">仓库名称</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="name" placeholder="请输入仓库名称" autocomplete="off" class="layui-input">
+			    </div>
+			</div>
+		</div>
+
+		<div class="layui-col-md4">
+			<div class="layui-form-item">
+			    <label class="layui-form-label">仓库别名</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="name_sc"  placeholder="请输入仓库名称" autocomplete="off" class="layui-input">
+			    </div>
+			</div>
+		</div>
+
+		<div class="layui-col-md4">
+			<div class="layui-form-item">
+			    <label class="layui-form-label">所在楼</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="building"  placeholder="请输入所在楼" autocomplete="off" class="layui-input">
+			    </div>
+			</div>
+		</div>
+		
+		<div class="layui-col-md4">
+			<div class="layui-form-item">
+			    <label class="layui-form-label">仓库房间号</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="room" placeholder="请输入仓库房间号" autocomplete="off" class="layui-input">
+			    </div>
+			</div>
+		</div>
+
+		<div class="layui-col-md4">
+			<div class="layui-form-item">
+			    <label class="layui-form-label">功能描述</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="desc" placeholder="请输入仓库功能描述" autocomplete="off" class="layui-input">
+			    </div>
+			</div>
+		</div>
+
+		<div class="layui-col-md4">
+			<div class="layui-form-item">
+			    <div class="layui-input-block">
+			      <button class="layui-btn" lay-submit lay-filter="getDemo">查询</button>
+			    </div>
+			</div>
+		</div>
+
+    </form>
+  </div>
+</fieldset>
+
+<table id="demo" lay-filter="test"></table>
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+          
+<script>
+layui.use(['table', 'form'], function(){
+  var table = layui.table;
+  var form = layui.form;
+  var $ = layui.$;
+  //第一个实例
+  table.render({
+    elem: '#demo'
+    ,height: 312
+    ,url: '/yinshua/index.php/storehouse/data' //数据接口
+    ,page: true //开启分页
+    ,cols: [[ //表头
+     {field: 'storehouse_name', title: '仓库名称'}
+      ,{field: 'storehouse_name_sc', title: '仓库别名'}
+      ,{field: 'storehouse_building', title: '所在楼'} 
+      ,{field: 'storehouse_room', title: '仓库房间号'}
+      ,{field: 'storehouse_desc', title: '仓库功能描述'}
+      ,{field: 'storehouse_createtime', title: '创建时期'}
+      ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:150}
+	]]
+    ,id: 'idTest'
+  });
+
+  //监听提交
+  form.on('submit(formDemo)', function(data){
+    // layer.msg(JSON.stringify(data.field));
+    //eg1
+	var index = layer.load();
+    $.post("/yinshua/index.php/storehouse/add",{
+    	data:data.field
+    },function(str){
+    	str = eval("("+str+")");
+
+    	if (str.errcode == '0') {
+    		layer.msg(str.errmsg);
+    	}else{
+    		layer.msg(str.errmsg);
+    	}
+    	table.reload('idTest', {
+		  url: '/yinshua/index.php/storehouse/data'
+		  ,where: {} //设定异步数据接口的额外参数
+		  //,height: 300
+		});
+    	//关闭
+		layer.close(index);  
+    });
+    return false;
+  });
+
+  //监听行工具事件
+  table.on('tool(test)', function(obj){
+    var data = obj.data;
+    //console.log(obj)
+    if(obj.event === 'del'){
+      layer.confirm('真的删除行么', function(index){
+      	$.post("/yinshua/index.php/storehouse/del",{
+	    	data:data.id
+	    },function(str){
+	    	str = eval("("+str+")");
+
+	    	if (str.errcode == '0') {
+	    		layer.msg(str.errmsg);
+	    		obj.del();
+	    	}else{
+	    		layer.msg(str.errmsg);
+	    	}
+	    	table.reload('idTest', {
+			  url: '/yinshua/index.php/storehouse/data'
+			  ,where: {} //设定异步数据接口的额外参数
+			  //,height: 300
+			});
+	    });
+        
+        layer.close(index);
+      });
+    } else if(obj.event === 'edit'){
+    	var html = '<form class="layui-form" action="" style="padding: 10px;" >'+
+    	'<input type="hidden" name="id" value="'+data.id+'">'+
+		'<div class="layui-form-item">'+
+		    '<label class="layui-form-label">仓库名称</label>'+
+		    '<div class="layui-input-block">'+
+		      '<input type="text" name="name" required  lay-verify="required" placeholder="请输入仓库名称" autocomplete="off" class="layui-input" value="'+data.storehouse_name+'">'+
+		    '</div>'+
+		'</div>'+
+		'<div class="layui-form-item">'+
+		    '<label class="layui-form-label">仓库别名</label>'+
+		    '<div class="layui-input-block">'+
+		      '<input type="text" name="name_sc" required  lay-verify="required" placeholder="请输入仓库名称" autocomplete="off" class="layui-input" value="'+data.storehouse_name_sc+'">'+
+		    '</div>'+
+		'</div>'+
+		'<div class="layui-form-item">'+
+		    '<label class="layui-form-label">所在楼</label>'+
+		    '<div class="layui-input-block">'+
+		      '<input type="text" name="building" required  lay-verify="required" placeholder="请输入所在楼" autocomplete="off" class="layui-input" value="'+data.storehouse_building+'">'+
+		    '</div>'+
+		'</div>'+
+		'<div class="layui-form-item">'+
+		    '<label class="layui-form-label">仓库房间号</label>'+
+		    '<div class="layui-input-block">'+
+		      '<input type="text" name="room" required  lay-verify="required" placeholder="请输入仓库房间号" autocomplete="off" class="layui-input" value="'+data.storehouse_room+'">'+
+		    '</div>'+
+		'</div>'+
+		'<div class="layui-form-item">'+
+		    '<label class="layui-form-label">功能描述</label>'+
+		    '<div class="layui-input-block">'+
+		      '<input type="text" name="desc" required  lay-verify="required" placeholder="请输入仓库功能描述" autocomplete="off" class="layui-input" value="'+data.storehouse_desc+'">'+
+		    '</div>'+
+		'</div>'+
+		'<div class="layui-form-item">'+
+		    '<div class="layui-input-block">'+
+		      '<button class="layui-btn" lay-submit lay-filter="editDemo">修改</button>'+
+		   '</div>'+
+		'</div>' +
+    	'</from>';
+      	layer.open({
+		  type: 1,
+		  area: ['500px', '400px'], 
+		  content: html //这里content是一个普通的String
+		})
+
+      	//监听修改提交
+	  	form.on('submit(editDemo)', function(data){
+	    // layer.msg(JSON.stringify(data.field));
+	    //eg1
+		var index = layer.load();
+	    $.post("/yinshua/index.php/storehouse/edit",{
+	    	data:data.field
+	    },function(str){
+	    	str = eval("("+str+")");
+
+	    	if (str.errcode == '0') {
+	    		layer.msg(str.errmsg);
+	    	}else{
+	    		layer.msg(str.errmsg);
+	    	}
+	    	table.reload('idTest', {
+			  url: '/yinshua/index.php/storehouse/data'
+			  ,where: {} //设定异步数据接口的额外参数
+			  //,height: 300
+			});
+	    	//关闭
+			layer.close(index);  
+	    });
+	    return false;
+	  });
+
+    }
+  });
+
+   //监听提交
+  form.on('submit(getDemo)', function(data){
+    // layer.msg(JSON.stringify(data.field));
+    // $.post("/yinshua/index.php/storehouse/getData");
+    table.reload('idTest', {
+		  url: '/yinshua/index.php/storehouse/data'
+		  ,where: {
+		  	data:data.field
+		  } //设定异步数据接口的额外参数
+			  //,height: 300
+		  ,page: {
+		    curr: 1 //重新从第 1 页开始
+		  }
+		});
+    return false;
+  });
+
+
+});
+</script>

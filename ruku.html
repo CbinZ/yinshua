@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="./resource/layui/css/layui.css">
+	<script src="./resource/layui/layui.all.js"></script>
+</head>
+<body>
+
+<style type="text/css">
+	.search
+	{
+		padding: 30px 0;
+		margin-bottom: 10px;
+		position: relative;
+		width:100%;
+		background-color: #F7DAA5;
+
+	}
+</style>
+
+	<div class="layui-row search ">
+		 <form class="layui-form" action="">
+		 	<div class="layui-col-md2 layui-col-md-offset5">
+			 	<div class="layui-col-md10">
+			 	 <input type="text" name="scdh" required  lay-verify="required" placeholder="请输入生产单号" autocomplete="off" class="layui-input">
+				</div>
+				<div class="layui-col-md2">
+					<button class="layui-btn layui-btn-warm layui-btn-fluid" lay-submit lay-filter="formDemo">
+					<i class="layui-icon layui-icon-search"></i> 
+					</button>
+				</div>
+			</div>
+		 </form>
+	</div>
+
+
+
+<script>
+//Demo
+layui.use('form', function(){
+  var form = layui.form;
+  
+  //监听提交
+  form.on('submit(formDemo)', function(data){
+    //layer.msg(JSON.stringify(data.field));
+    //
+    $.post("./ci/index.php/")
+    return false;
+  });
+});
+</script>
+
+</bodu>
+</html>

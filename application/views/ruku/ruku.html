@@ -1,0 +1,327 @@
+
+<style type="text/css">
+	.search
+	{
+		padding: 30px 0;
+		margin-bottom: 10px;
+		position: relative;
+		width:100%;
+		background-color: #F7DAA5;
+
+	}
+</style>
+
+	<div class="layui-row search ">
+		 <form class="layui-form" action="">
+		 	<div class="layui-col-md2 layui-col-md-offset5">
+			 	<div class="layui-col-md10">
+			 	 <input type="text" name="scdh" required  lay-verify="required" placeholder="请输入生产单号" autocomplete="off" class="layui-input">
+				</div>
+				<div class="layui-col-md2">
+					<button class="layui-btn layui-btn-warm layui-btn-fluid" lay-submit lay-filter="formDemo">
+					<i class="layui-icon layui-icon-search"></i> 
+					</button>
+				</div>
+			</div>
+		 </form>
+	</div>
+
+	<div class="layui-row">
+		<div class="layui-col-md10 layui-col-md-offset1" style="height:400;">
+		
+			<table id="demo" lay-filter="test"></table>
+		</div>
+	</div>
+
+
+<script type="text/html" id="barDemo">
+  {{# if(d.ly < 1){ }}
+
+    {{# if(d.ruku_sate == 1) { }}
+      <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="bianji" >反入库</a>
+    {{# } else { }}
+      <a class="layui-btn layui-btn-xs" lay-event="ruku-btn">入库</a>
+    {{# } }}
+  {{# }else{ }}  
+  
+    <a class="layui-btn layui-btn-xs layui-btn-disabled">已领用</a>
+  {{# } }} 
+  
+
+</script>
+<script>
+//Demo
+var index; //编辑弹出窗的index;
+layui.use(['form', 'table', 'layer'], function(){
+  var form = layui.form;
+  var table = layui.table;
+  var layer = layui.layer;
+  var $ = layui.$;
+  //监听提交
+  form.on('submit(formDemo)', function(data){
+    //layer.msg(data.field.scdh);
+    //
+   	table.reload('idTest', {
+	  url: '/index.php/ruku/data'
+	  ,where: {
+	  	scdh:data.field.scdh
+	  } //设定异步数据接口的额外参数
+	  //,height: 300
+	  });
+    return false;
+  });
+
+  table.render({
+    elem: '#demo'
+    ,height: 'full-200'
+    ,url: '/index.php/ruku/data' //数据接口
+    ,cellMinWidth: 80 
+    ,page: {layout:['count','prev', 'page', 'next']} //开启分页
+    ,cols: [[ //表头
+      {field: 'xh', title: '序号', width:80, fixed: 'left'}
+      ,{field: 'khmc', title: '客户名称', width:90}
+      ,{field: 'cpbh', title: '产品编号'}
+      ,{field: 'cpmc', title: '产品名称'}
+      ,{field: 'cpgg', title: '产品规格'} 
+      ,{field: 'ystb', title: '印刷跳步', width: 90}
+      ,{field: 'ylms', title: '余料米数', width: 90, edit: 'text'}
+      ,{field: 'pbsl', title: '拼板模数', width: 90, edit: 'text'}
+      ,{field: 'ylsl', title: '余料数量', width: 90, edit: 'text'}
+      ,{field: 'dw', title: '单位', width: 90}
+      ,{field: 'cw', title: '仓位', width: 90,  edit: 'text'}
+      ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:100}
+
+    ]]
+    ,id: "idTest"
+  });
+
+  //监听行单击事件（双击事件为：rowDouble）
+  /*table.on('row(test)', function(obj){
+    var data = obj.data;
+    
+    layer.alert(JSON.stringify(data), {
+      title: '当前行数据：'
+    });
+    
+    //标注选中样式
+    obj.tr.addClass('layui-table-click').siblings().removeClass('layui-table-click');
+  });*/
+
+  //监听行工具事件
+  
+  table.on('tool(test)', function(obj){
+    var data = obj.data;
+    //console.log(obj)
+    if(obj.event === 'ruku-btn'){
+      
+      if (data.ylms == "" || data.cw == "" ) {
+        layer.msg("余料米数和仓位不能为空");
+        return false;
+      }
+     
+      $.post("/index.php/ruku/add",{
+        data:data
+      },function(str){
+        str = eval('('+str+')');
+
+        if (str.errcode == '0') {
+           //obj.del();
+          table.reload('idTest', {
+            url: '/index.php/ruku/data'
+            ,where: {
+              scdh:data.scdh
+            } //设定异步数据接口的额外参数
+            //,height: 300
+          });
+        }else{
+          layer.msg("操作失败，请联系管理员");
+        }
+      })
+    } else if(obj.event === 'bianji'){
+
+      var html = '<div style="padding:10px;"><form class="layui-form" action="">'+
+      ' <div class="layui-form-item">'+
+        '<input name="cpbh" type="hidden" value="'+data.cpbh+'">' +
+        '<input name="ystb" type="hidden" value="'+data.ystb+'">' +
+        '<label class="layui-form-label">余料米数</label>'+
+          '<div class="layui-input-block">'+
+            '<input type="number" name="ylms" id="ylms" required  lay-verify="required" placeholder="请输入余料米数" autocomplete="off" class="layui-input" value="'+data.ylms+'">'+
+          '</div>'+
+        '</div>'+
+        ' <div class="layui-form-item">'+
+        '<label class="layui-form-label">拼板模数</label>'+
+          '<div class="layui-input-block">'+
+            '<input type="number" name="pbms" id="pbms" required  lay-verify="required" placeholder="请输入拼板模数" autocomplete="off" class="layui-input" value="'+data.pbsl+'">'+
+          '</div>'+
+        '</div>'+
+         ' <div class="layui-form-item">'+
+        '<label class="layui-form-label">余料数量</label>'+
+          '<div class="layui-input-block">'+
+            '<input type="number" name="ylsl" id="ylsl" required  lay-verify="required" placeholder="请输入余料数量" autocomplete="off" class="layui-input" value="'+data.ylsl+'">'+
+          '</div>'+
+        '</div>'+
+        ' <div class="layui-form-item">'+
+        '<label class="layui-form-label">仓位</label>'+
+          '<div class="layui-input-block">'+
+            '<input type="text" name="cw" required  lay-verify="required" placeholder="请输入仓位" autocomplete="off" class="layui-input" value="'+data.cw+'">'+
+          '</div>'+
+        '</div>'+
+
+        '<div class="layui-form-item">'+
+          '<div class="layui-input-block">' +
+            '<button class="layui-btn" lay-submit lay-filter="formDemo2">修改</button>'+
+            '<button type="button" class="layui-btn  layui-btn-danger " onclick="cxrk(\''+data.cpbh+'\')" >撤销入库</button>'+
+          '</div>'+
+        '</div>'+
+      '</from></div>';
+
+     index = layer.open({
+        type: 1,
+        title:"编辑",
+        area: ['500px', '350px'],
+        content: html, //这里content是一个普通的String
+        end:function(){
+          table.reload('idTest', {
+          url: '/index.php/ruku/data'
+          ,where: {
+            scdh:data.scdh
+          } //设定异步数据接口的额外参数
+          //,height: 300
+          });
+        }
+      });
+
+      $("#ylms").change(function(){
+        var ylsl = 0;
+        var pbms = $('#pbms').val();
+        var ylms = $('#ylms').val();
+        ylsl = 1000 * pbms * ylms / data.ystb;
+        $('#ylsl').val(Math.ceil(ylsl));
+      })
+
+      $("#pbms").change(function(){
+        var ylsl = 0;
+        var pbms = $('#pbms').val();
+        var ylms = $('#ylms').val();
+        ylsl = 1000 * pbms * ylms / data.ystb;
+        $('#ylsl').val(Math.ceil(ylsl));
+      });
+
+      $("#ylsl").change(function(){
+        var ylms = 0;
+        var pbms = $('#pbms').val();
+        var ylsl = $('#ylsl').val();
+        ylms = ylsl * data.ystb / pbms / 1000;
+        $('#ylms').val(Math.ceil(ylms));
+      });
+    }
+  });
+
+
+  table.on('edit(test)', function(obj){ //注：edit是固定事件名，test是table原始容器的属性 lay-filter="对应的值"
+    //console.log(obj.value); //得到修改后的值
+    //console.log(obj.field); //当前编辑的字段名
+    //console.log(obj.data); //所在行的所有相关数据 
+    
+    if (obj.field == 'cw') {
+      return true;
+    }
+
+    var field = obj.field;
+    var value = obj.value;
+    var data = obj.data;
+    // console.log(data);
+    var regPos = /^\d+(\.\d+)?$/; //非负浮点数
+    var regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数
+    if(regPos.test(value) || regNeg.test(value)){
+       if (obj.field == 'pbsl') {
+           var oldValue = $(this).prev().text();
+           if (Number(oldValue) < Number(obj.value)) {
+              layer.msg('输入值不能大于原先值');
+              $(this).val(oldValue); // 重置为修改前的值
+              return false;
+           }
+       }
+    }else{
+       layer.msg('请输入数字');
+       var oldValue = $(this).prev().text(); // 修改前的值
+       $(this).val(oldValue); // 重置为修改前的值
+       return false;
+    }
+
+    // console.log(field);
+    if (field == "ylms") {
+        var ylsl = 0;
+
+        ylsl = 1000 * data.pbsl * data.ylms / data.ystb;
+
+        obj.update({
+            ylsl: Math.ceil(ylsl)
+          });
+    }
+
+    if (field== "ylsl") {
+      var ylms = 0;
+      ylms = data.ylsl * data.ystb / data.pbsl / 1000;
+
+      obj.update({
+          ylms: Math.ceil(ylms)
+        });
+    }
+    
+
+    if (field == "pbsl") {
+        var ylsl = 0;
+
+        ylsl = 1000 * data.pbsl * data.ylms / data.ystb;
+
+        obj.update({
+            ylsl: Math.ceil(ylsl)
+        });
+    }
+  });
+
+    //监听提交
+  form.on('submit(formDemo2)', function(data){
+    // layer.msg(JSON.stringify(data.field));
+    // 
+    
+    $.post("/index.php/ruku/xiugai",{
+      data:data.field
+    },function(str){
+      str = eval("("+str+")");
+
+      if (str.errcode == '0') {
+        layer.close(index); //此时你只需要把获得的index，轻轻地赋予layer.close即可
+        layer.msg('修改成功');
+                
+      }else{
+        layer.msg(str.errmsg);
+      }
+    });
+    return false;
+  });
+
+});
+
+function cxrk(cpbh)
+{
+  var layer = layui.layer;
+  var $ = layui.$;
+
+  $.post("/index.php/ruku/cxrk",{
+    cpbh:cpbh
+  },function(str){
+    str = eval("("+str+")");
+    
+    if (str.errcode == '0') {
+        layer.close(index); //此时你只需要把获得的index，轻轻地赋予layer.close即可
+        layer.msg('撤销成功');
+        
+        
+      }else{
+        layer.msg(str.errmsg);
+      }
+  })
+}
+</script>

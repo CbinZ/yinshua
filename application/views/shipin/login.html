@@ -1,0 +1,87 @@
+<style type="text/css">
+	html,body {
+		width: 100%;
+        height:100%;
+        background: #00a0e9;
+        background-repeat: no-repeat;
+        background-size: 100%   100%;
+	}
+	.login-div{
+		border: solid 1px #eeeeee;
+		height: 300px;
+		border-radius: 5px;
+		background: #ffffff;
+		margin-top: 200px;
+	}
+
+
+</style>
+
+<div class="layui-row">
+	
+	<div class="layui-col-md4 layui-col-md-offset4 login-div">
+		<div class="layui-col-md12" >
+			<div class="layui-col-md1" style="padding:10px;">
+	            <i class="layui-icon layui-icon-component" style="font-size: 30px;margin-left: 10px;"></i>
+	        </div>
+
+	        <div class="layui-col-md8" style="padding:10px;">
+	            <h2>登录</h2>
+	        </div>
+        </div>
+
+        <hr>
+		<div class="layui-col-md12" style="padding:10px;">
+	        <form class="layui-form" action="">
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">账号</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="zhanhao" required  lay-verify="required" placeholder="请输入账号" autocomplete="off" class="layui-input">
+			    </div>
+			    <div class="layui-form-mid layui-word-aux"></div>
+			  </div>
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">密码框</label>
+			    <div class="layui-input-block">
+			      <input type="password" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+			    </div>
+			    
+			  </div>
+			  
+			  <div class="layui-form-item">
+			    <div class="layui-input-block">
+			      <button class="layui-btn" type="button" lay-submit lay-filter="formDemo">登录</button>
+			      
+			    </div>
+			  </div>
+			</form>
+		</div>
+
+	</div>
+</div>
+
+<script>
+//Demo
+layui.use('form', function(){
+  var form = layui.form;
+  var $ = layui.$;
+  //监听提交
+  form.on('submit(formDemo)', function(data){
+    // layer.msg(JSON.stringify(data.field));
+    $.post("/index.php/shipin/login/sign_in",{
+    	data:data.field
+    },function(str){
+    	
+      str = eval('('+str+')');
+
+      if (str.errcode == '0') {
+        window.location.href="/index.php/shipin/index"  
+      }else{
+        layer.msg(str.errmsg);
+      }
+    });
+
+    return false;
+  });
+});
+</script>

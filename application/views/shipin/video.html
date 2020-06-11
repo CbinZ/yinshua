@@ -1,0 +1,78 @@
+<link href="/resource/jqvidoe/css/video-js.min.css" rel="stylesheet" type="text/css">
+<script src="/resource/jqvidoe/js/video.min.js"></script>
+<style>
+
+   video::-webkit-media-controls,
+    video::-moz-media-controls,
+    video::-webkit-media-controls-enclosure{
+    display:none !important;
+}
+
+video::-webkit-media-controls-panel,
+video::-webkit-media-controls-panel-container,
+video::-webkit-media-controls-start-playback-button {
+    display:none !important;
+    -webkit-appearance: none;
+}
+</style>
+
+<!-- <video id="my-video_html5_api" class="vjs-tech" preload="auto" poster="m.jpg" data-setup="{}" tabindex="-1" src="http://vjs.zencdn.net/v/oceans.mp4">
+<source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+<source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">
+<source src="http://vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
+<p class="vjs-no-js"> To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank" class="vjs-hidden" hidden="hidden">supports HTML5 video</a> </p>
+</video> -->
+<div style="width: 1200px ;height:750px;">
+	<video id="example_video_1" class="video-js vjs-default-skin" controls preload="none" width="1200" height="710"
+     
+      data-setup="{}">
+	    <source src="<?php echo $vurl?>" type='video/mp4' />
+	    <source src="<?php echo $vurl?>" type='video/webm' />
+	    <source src="<?php echo $vurl?>" type='video/ogg' />
+	  
+	</video>
+</div>
+<!-- <div style='height:20%'><button class='layui-btn play-video' >播放/暂停</button><button class='layui-btn quanpin' >全屏</button> </div>
+ -->
+<script type="text/javascript">
+
+var $ = layui.$;
+$('#example_video_1').bind('contextmenu',function() { return false; });
+videojs.options.flash.swf = "video-js.swf";
+var myPlayer = videojs('example_video_1');
+    videojs("example_video_1").ready(function(){
+        var myPlayer = this;
+        myPlayer.play();
+
+
+    });
+ 
+  /*var myVideo=document.getElementById("video1");
+
+  $('#video1').bind('contextmenu',function() { return false; });
+  
+  $('.play-video').click(function(){
+    if (myVideo.paused) 
+     myVideo.play(); 
+    else 
+     myVideo.pause(); 
+   
+  });
+  $('.quanpin').click(function(){
+     var ele = document.getElementById('video1');
+    if (ele.requestFullscreen) {
+        ele.requestFullscreen();
+    } else if (ele .mozRequestFullScreen) {
+        ele.mozRequestFullScreen();
+    } else if (ele .webkitRequestFullScreen) {
+        ele.webkitRequestFullScreen();
+    }
+   
+  });*/
+  /*var myPlayer = videojs('example_video_1');
+   videojs("example_video_1").ready(function(){
+        var myPlayer = this;
+        myPlayer.play();
+    });*/
+
+</script>

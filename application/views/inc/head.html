@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Document</title>
+  <link rel="stylesheet" href="/yinshua/resource/layui/css/layui.css">
+  <script src="/yinshua/resource/layui/layui.all.js"></script>
+</head>
+<body class="layui-layout-body">
+
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo"  >****</div>
+        <!-- 头部区域（可配合layui已有的水平导航） -->
+
+        <ul class="layui-nav layui-layout-right">
+           
+            <li class="layui-nav-item"><a href="">退出</a></li>
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+
+            <ul class="layui-nav layui-nav-tree "  lay-filter="test">
+
+                <li class="layui-nav-item  ">
+                    <a class="" href="javascript:;">仓库</a>
+                    <dl class="layui-nav-child">
+                        <li class=""><a class="" href="/yinshua/index.php/Storehouse/zsgc" onclick="return false" id="ck_zsgc">增删改查</a></li>
+                    </dl>
+                </li>
+
+            </ul>
+
+        </div>
+    </div>
+
+
+
+
+    <div class="layui-body">
+
+        <div class="layui-tab" lay-filter="test1" lay-allowclose="true">
+            <ul class="layui-tab-title">
+
+            </ul>
+            <div class="layui-tab-content" style="height: 750px;">
+
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
+<script>
+    //JavaScript代码区域
+    layui.use('element', function(){
+        var element = layui.element;
+        var $ = layui.$;
+		element.init();
+        //监听导航点击
+        element.on('nav(test)', function(elem){
+//            console.log(elem.context.attributes["href"].value);
+//            layer.msg(elem.document.getElementById());
+
+
+            var nav_id =  elem.context.id;
+            var update = false;
+            var url =  elem.context.attributes["href"].value;
+            if (nav_id !== ""){
+                    $(".layui-tab-title li").each(function () {
+                        if (nav_id === this.getAttribute('lay-id')){
+                            update = true;
+                        };
+                    });
+
+                if (update){
+                    //监听Tab切换，以改变地址hash值
+                    element.tabChange('test1', nav_id); //切换到：用户管理
+                }else {
+                    //新增一个Tab项
+                    element.tabAdd('test1', {
+                        title: elem.text() //用于演示
+                        ,content: "<iframe src='"+url+"' style='height:750px; width:100%;border: 0px;'></iframe>"
+                        ,id: nav_id //实际使用一般是规定好的id，这里以时间戳模拟下
+                    })
+                    element.tabChange('test1', nav_id); //切换到：用户管理
+                }
+            }
+
+
+
+        });
+
+    });
+
+</script>
